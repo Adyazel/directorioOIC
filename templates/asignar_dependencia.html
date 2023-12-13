@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+{% block title %}Asignar Dependencia{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Asignar Dependencia a OIC</h2>
+    <form method="POST" action="{{ url_for('asignar_dependencia') }}">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            <i class="fa-solid fa-user-tie"></i> {{ form.oic_id.label(class="form-label") }}
+            {{ form.oic_id(class="form-select") }}
+            {% if form.oic_id.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.oic_id.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="mb-3">
+            <i class="fa-solid fa-magnifying-glass"></i> {{ form.dependencia_id.label(class="form-label") }}
+            {{ form.dependencia_id(class="form-select") }}
+            {% if form.dependencia_id.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.dependencia_id.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        <div class="">
+          <button type="button" class="btn btn-success" id="openConfirmAssignModal">Asignar +</button>
+        </div>
+    </form>
+
+    <h3 class="mt-4">Dependencias Asignadas</h3>
+    <div id="searchBox" style="position:relative; width:100%;">
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Titular del OIC</th>
+                <th>Nombre de la Dependencia</th>
+                <th>Logo</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dependencia in dependencias %}
+            {% if dependencia.oic_id is not none %}
+            <tr>
+                <td>{{ dependencia.oic.nombre_completo if dependencia.oic else 'Sin Asignar' }}</td>
+                <td>{{ dependencia.nombre }}</td>
+                <td><img src="{{ url_for('uploaded_file', filename=dependencia.foto) }}" width="100" alt="Foto de Dependencia"></td>
+                <td>
+                   
+                    <label class="switch">
+                        <input type="checkbox" disabled {{ 'checked' if dependencia.habilitada else '' }}>
+                        <span class="slider"></span>
+                    </label>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-danger btn-unlink-dependencia" data-dependencia-id="{{ dependencia.id }}" data-bs-toggle="modal" data-bs-target="#confirmUnlinkModal">Desasignar</button>
+
+
+                </td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal Contenedor -->
+<div id="customModal" class="custom-modal-container" style="display:none;">
+    <!-- Modal Dialog -->
+    <div class="custom-modal-dialog">
+      <!-- Modal Content -->
+      <div class="custom-modal-content">
+        <!-- Modal Header -->
+        
+        <!-- Modal Body -->
+        <div class="custom-modal-body">
+            <div class="iconomodal">
+                <i class="fa-regular fa-circle-question"></i>
+            </div>
+            <strong><p style="color: red">Esta acción es irreversible </p ></strong>
+            <p>¿Está seguro de desasignar la dependencia?</p>
+          
+        </div>
+        <!-- Modal Footer -->
+        <div class="custom-modal-footer">
+            <button type="button" class="btn btn-modal-confirm" id="confirmUnlinkButton">Desasignar</button>  
+          <br>
+          <button type="button" class="btn btn-modal-cancel" onclick="closeCustomModal('customModal');">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal para Confirmar Asignación de Dependencia -->
+<div id="confirmAssignModal" class="custom-modal-container" style="display:none;">
+  <div class="custom-modal-dialog">
+      <div class="custom-modal-content">
+          <div class="custom-modal-body">
+              <div class="iconomodal">
+                  <i class="fa-regular fa-circle-question"></i>
+              </div>
+              <strong><p style="color: red">Por favor, confirme su acción</p ></strong>
+              <p>¿Está seguro de asignar esta dependencia?</p>
+          </div>
+          <div class="custom-modal-footer">
+              <button type="button" class="btn btn-modal-confirm" id="confirmAssignButton">Asignar</button>
+              <br>
+              <button type="button" class="btn btn-modal-cancel" onclick="closeCustomModal('confirmAssignModal');">Cancelar</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+
+document.getElementById('openConfirmAssignModal').addEventListener('click', function() {
+    showCustomModal('confirmAssignModal');
+});
+
+document.getElementById('confirmAssignButton').addEventListener('click', function() {
+    // Enviar el formulario
+    document.forms[0].submit();
+});
+document.getElementById('openConfirmAssignModal').addEventListener('click', function() {
+    // Ejemplo de validación simple
+    if (document.getElementById('idDelCampoDeDependencia').value) {
+        showCustomModal('confirmAssignModal');
+    } else {
+        alert('Por favor, seleccione una dependencia.');
+    }
+});
+
+// Función para mostrar el modal con efecto de desplazamiento desde arriba
+function showCustomModal(modalId) {
+  var modal = document.getElementById(modalId);
+  modal.style.display = 'flex';
+  setTimeout(() => {
+    modal.classList.add('custom-modal-active');
+  }, 10);
+  document.body.style.overflow = 'hidden';
+}
+
+
+// Función para cerrar el modal con efecto de desplazamiento hacia arriba
+function closeCustomModal(modalId) {
+  var modal = document.getElementById(modalId);
+  modal.classList.remove('custom-modal-active');
+  setTimeout(() => {
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }, 300);
+}
+// Cerrar el modal al hacer clic fuera de él
+window.addEventListener('click', function(event) {
+  var modal = document.getElementById('customModal');
+  if (event.target === modal) {
+    closeCustomModal();
+  }
+});
+
+// Agregar evento de clic a cada botón de desasignar
+document.querySelectorAll('.btn-unlink-dependencia').forEach(button => {
+  button.addEventListener('click', function() {
+    var dependenciaId = button.getAttribute('data-dependencia-id');
+    openUnlinkModal(dependenciaId); // Llamar a la función que abre el modal
+  });
+});
+
+
+         // Mostrar el buscador cuando se hace clic en la tabla
+document.addEventListener('click', function(event) {
+    var searchBox = document.getElementById('searchBox');
+    var isInsideSearchBox = event.target.closest('#searchBox');
+    var isEditButton = event.target.classList.contains('btn-edit-dependencia');
+    var isInsideTable = event.target.closest('.table');
+
+   
+});
+
+// Funcionalidad de filtrado
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    var searchValue = this.value.toLowerCase();
+    var tableRows = document.querySelectorAll('.table tbody tr');
+
+    tableRows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        var isVisible = searchValue.split(' ').some(function(term) {
+            return text.includes(term);
+        });
+        row.style.display = isVisible ? '' : 'none';
+    });
+});
+// Función para abrir el modal personalizado con la información correcta
+function openUnlinkModal(dependenciaId) {
+  // Configurar el modal con la información de la dependencia
+  var confirmButton = document.getElementById('confirmUnlinkButton');
+  
+  // Remover previos manejadores de eventos para asegurarse de que solo hay uno
+  confirmButton.replaceWith(confirmButton.cloneNode(true));
+  confirmButton = document.getElementById('confirmUnlinkButton');
+  
+  // Agregar el manejador de eventos
+  confirmButton.addEventListener('click', function() {
+    fetch('/desasignar_dependencia/' + dependenciaId, { method: 'POST' })
+      .then(response => {
+        if (response.ok) {
+          return response.text();
+        } else {
+          throw new Error('Algo salió mal al desasignar la dependencia.');
+        }
+      })
+      .then(() => {
+        window.location.reload(); // Recargar la página para mostrar los cambios
+      })
+      .catch(error => console.error(error));
+  });
+
+  // Mostrar el modal
+  showCustomModal('customModal');
+}
+
+
+    // Agregar evento de clic a cada botón de desasignar
+document.querySelectorAll('.btn-unlink-dependencia').forEach(button => {
+  button.addEventListener('click', function() {
+    var dependenciaId = button.getAttribute('data-dependencia-id');
+    openUnlinkModal(dependenciaId); // Llamar a la función que abre el modal
+  });
+});
+
+    var loggedin = $('#loggedin').data('data'); // Referencia a base.html
+    var currentUserRole = "{{ current_user.rol }}";
+        var manageUsersUrl = "{{ url_for('manage_users') }}";
+        var addDataUrl = "{{ url_for('add_data') }}";
+        var agregarDependenciaUrl = "{{ url_for('agregar_dependencia') }}";
+        var login = "{{ url_for('login') }}";
+        var logout = "{{ url_for('logout') }}";
+    
+        $(document).ready(function () {
+        setTimeout(function () {
+            let menuHTML = '<li class="stg-nav-item"><a href="./" class="stg-nav-link">Inicio</a></li>';
+    
+            if (currentUserRole == 1) {
+                menuHTML += '<li class="stg-nav-item"><a href="' + manageUsersUrl + '" class="stg-nav-link">Catálogo Usuarios</a></li>';
+            }
+            if(loggedin == 1){
+                menuHTML += '<li class="stg-nav-item"><a href="' + addDataUrl + '" class="stg-nav-link">Agregar OIC</a></li>';
+            menuHTML += '<li class="stg-nav-item"><a href="' + agregarDependenciaUrl + '" class="stg-nav-link">Agregar Dependencia</a></li>';
+            menuHTML += '<li class="stg-nav-item"><a href="' +logout + '" class="stg-nav-link"><i class="fa-solid fa-right-from-bracket"></i></a></li>';
+            }else{
+                menuHTML += '<li class="stg-nav-item"><a href="' +login + '" class="stg-nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></li>';
+            }
+            
+    
+            $("#stgNavMain").html(menuHTML);
+        }, 200);
+    });
+    document.querySelector('.btn-close').addEventListener('click', function() {
+var modal = bootstrap.Modal.getInstance(editOICModal);
+modal.hide();
+});
+</script>
+
+{% endblock %}

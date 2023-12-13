@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap');
+
+
+*{ margin: 0;}
+
+:root{
+  --azulTitulos:#004d84;
+  --azulTitulos2:#0C5893;
+}
+h2{
+    color: var(--azulTitulos2);
+}
+body {
+    font-family: 'Public Sans', sans-serif;
+    background-image: url(/static/images/Fondo.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.stg-footer .stg-container{
+    display: none !important;
+  }
+.stg-top-header{
+      display: none !important;
+}
+
+
+.formU {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.input-group i {
+    margin-right: 15px;
+}
+
+.form-control.is-invalid {
+    padding-right: 30px; /* Ajusta el padding si es necesario para el ícono de error */
+}
+
+.invalid-feedback {
+    width: 100%; /* Esto coloca el mensaje de error en su propia línea */
+    margin-top: 5px;
+}
+
+.invalid-icon {
+    background-image: url('path-to-your-error-icon.png');
+    width: 16px;
+    height: 16px;
+    margin-left: -26px; /* Ajusta según el tamaño de tu ícono */
+   
+}
+.card{
+    max-width: 400px;
+    margin-top: 7%;
+    margin-left: 15%;
+    background-color: rgba(255, 255, 255, 0.725);
+}
+input[type=text] {
+    background-color: rgba(255, 255, 255, 0.545);
+}
+
+
+input[type=password]{
+    background-color: rgba(255, 255, 255, 0.545);
+}
+.btn-log{
+   background-color: #1785bc; 
+   color: white;
+}
+.btn-log:hover{
+    background-color: #147cb4; 
+    color: white;
+ }
+ .logo{
+    width: 100%;
+    margin-bottom: 10px;
+ }
+

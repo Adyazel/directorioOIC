@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}ABMC{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h2>ABMC - Administración</h2>
+    {% if current_user.rol == 1 %}
+    <a href="{{ url_for('manage_users') }}" class="btn btn-primary">Gestionar Usuarios</a>
+    {% endif %}
+    <a href="{{ url_for('add_data') }}" class="btn btn-primary">Agregar Datos</a>
+    <a href="{{ url_for('agregar_dependencia') }}" class="btn btn-primary">Agregar Dependencia</a>
+    <a href="{{ url_for('asignar_dependencia') }}" class="btn btn-primary">Asignar Dependencia</a>
+</div>
+
+
+{% endblock %}
+{% block scripts %}
+
+<script>
+var loggedin = $('#loggedin').data('data'); // Referencia a base.html
+var currentUserRole = "{{ current_user.rol }}";
+    var manageUsersUrl = "{{ url_for('manage_users') }}";
+    var addDataUrl = "{{ url_for('add_data') }}";
+    var agregarDependenciaUrl = "{{ url_for('agregar_dependencia') }}";
+    var asignarDependenciaUrl = "{{ url_for('asignar_dependencia') }}";
+    var login = "{{ url_for('login') }}";
+    var logout = "{{ url_for('logout') }}";
+
+    $(document).ready(function () {
+    setTimeout(function () {
+        let menuHTML = '<li class="stg-nav-item"><a href="./" class="stg-nav-link">Inicio</a></li>';
+
+        if (currentUserRole == 1) {
+            menuHTML += '<li class="stg-nav-item"><a href="' + manageUsersUrl + '" class="stg-nav-link">Gestionar Usuarios</a></li>';
+        }
+        if(loggedin == 1){
+            menuHTML += '<li class="stg-nav-item"><a href="' + addDataUrl + '" class="stg-nav-link">Agregar Datos</a></li>';
+        menuHTML += '<li class="stg-nav-item"><a href="' + agregarDependenciaUrl + '" class="stg-nav-link">Agregar Dependencia</a></li>';
+        menuHTML += '<li class="stg-nav-item"><a href="' + asignarDependenciaUrl + '" class="stg-nav-link">Asignar Dependencia</a></li>';
+        menuHTML += '<li class="stg-nav-item"><a href="' +logout + '" class="stg-nav-link">Logout</a></li>';
+        }else{
+            menuHTML += '<li class="stg-nav-item"><a href="' +login + '" class="stg-nav-link">LogIn</a></li>';
+        }
+        
+
+        $("#stgNavMain").html(menuHTML);
+    }, 200);
+});
+
+</script>
+{% endblock %}

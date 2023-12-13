@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar OIC{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Formulario de Registro OIC</h2>
+    
+
+    <form method="POST" action="{{ url_for('add_data') }}" class="mb-3">
+        {{ form.hidden_tag() }}
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-id-card"></i> {{ form.nombre_completo.label(class="form-label") }}
+                {{ form.nombre_completo(class="form-control") }}
+            </div>
+            <div class="col">
+
+                <i class="fa-solid fa-envelope"></i> {{ form.correo_electronico.label(class="form-label") }}
+                <input type="email" id="correo_electronico" name="correo_electronico" class="form-control" onkeyup="checkEmail()">
+                
+            </div>
+        </div>
+        <div class="row">
+         
+            <div class="col">
+                <i class="fa-solid fa-phone"></i> {{ form.telefono.label(class="form-label") }}
+                {{ form.telefono(class="form-control") }}
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-tty"></i> {{ form.extension.label(class="form-label") }}
+                {{ form.extension(class="form-control") }}
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-user-tie"></i> {{ form.sector.label(class="form-label") }}
+                {{ form.sector(class="form-control") }}
+            </div>
+        </div>
+        <div class="row">
+           <div class="col">
+            <i class="fa-solid fa-city"></i> {{ form.ciudad.label(class="form-label") }}
+            {{ form.ciudad(class="form-control") }}
+           </div>
+           <div class="col">
+            <i class="fa-solid fa-building"></i> {{ form.direccion.label(class="form-label") }}
+            {{ form.direccion(class="form-control") }}
+           </div>
+           
+        </div>
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-tree-city"></i> {{ form.colonia.label(class="form-label") }}
+                {{ form.colonia(class="form-control") }}
+               </div>
+               <div class="col">
+                <i class="fa-solid fa-envelopes-bulk"></i> {{ form.codigo_postal.label(class="form-label") }}
+                {{ form.codigo_postal(class="form-control") }}
+               </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+            </div>
+            
+        </div>
+    </form>
+    <hr>
+
+<h3>Lista de Registros OIC</h3>
+<div id="searchBox" style="position:relative; width:100%;">
+    <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre Completo</th>
+            <th>Teléfono</th>
+            <th>Correo Electrónico</th>
+            <th>Ciudad</th>
+            <th>Sector</th>
+            <th>Estatus</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for oic in oics %}
+        <tr>
+            <td>{{ oic.nombre_completo }}</td>
+            <td>{{ oic.telefono }}</td>
+            <td>{{ oic.correo_electronico }}</td>
+            <td>{{ oic.ciudad }}</td>
+            <td>{{ oic.sector }}</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" disabled {{ 'checked' if oic.esta_habilitado else '' }}>
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <!-- Botón para abrir el modal de edición con los datos del OIC -->
+                <button type="button" class="btn btn-edit btn-edit-oic" data-bs-toggle="modal" data-bs-target="#editOICModal" 
+        data-oic-id="{{ oic.id }}"
+        data-nombre-completo="{{ oic.nombre_completo }}"
+        data-telefono="{{ oic.telefono }}"
+        data-extension="{{ oic.extension }}"
+        data-correo-electronico="{{ oic.correo_electronico }}"
+        data-direccion="{{ oic.direccion }}"
+        data-colonia="{{ oic.colonia }}"
+        data-codigo-postal="{{ oic.codigo_postal }}"
+        data-ciudad="{{ oic.ciudad }}"
+        data-sector="{{ oic.sector }}"
+        data-dependencia="{{ oic.dependencia }}"
+        data-esta-habilitado="{{ 'true' if oic.esta_habilitado else 'false' }}">Editar</button>
+
+
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- Modal para editar OIC -->
+<div class="modal fade" id="editOICModal" tabindex="-1" aria-labelledby="editOICModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editOICModalLabel">Editar Registro OIC</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form id="editOICForm" method="POST" action="{{ url_for('update_oic') }}" class="mb-3">
+                {{ oic_update_form.hidden_tag() }}
+                <input type="hidden" name="oic_id" id="editOICId">
+                
+                <div class="row">
+                    <div class="col">
+                        <i class="fa-solid fa-id-card"></i> {{ oic_update_form.nombre_completo.label(class="form-label") }}
+                        {{ oic_update_form.nombre_completo(class="form-control", id="editNombreCompleto", disabled=True) }}
+                    </div>
+                    <div class="col">
+                        <i class="fa-solid fa-phone"></i> {{ oic_update_form.telefono.label(class="form-label") }}
+                        {{ oic_update_form.telefono(class="form-control", id="editTelefono") }}
+                    </div>
+                </div>
+            
+                <div class="row">
+                    <div class="col">
+                        <i class="fa-solid fa-envelope"></i> {{ oic_update_form.correo_electronico.label(class="form-label") }}
+                        {{ oic_update_form.correo_electronico(class="form-control", id="editCorreoElectronico") }}
+                    </div>
+                    <div class="col">
+                        <i class="fa-solid fa-city"></i> {{ oic_update_form.ciudad.label(class="form-label") }}
+                        {{ oic_update_form.ciudad(class="form-control", id="editCiudad", disabled=True) }}
+                    </div>
+                </div>
+            
+                <div class="row">
+                    <div class="col">
+                        <i class="fa-solid fa-user-tie"></i> {{ oic_update_form.sector.label(class="form-label") }}
+                        {{ oic_update_form.sector(class="form-control", id="editSector") }}
+                    </div>
+                </div>
+            
+                <!-- Agregando campos adicionales -->
+                <div class="row">
+                    <div class="col">
+                        <!-- Aquí puedes añadir iconos y otros campos si lo deseas -->
+                        <i class="fa-solid fa-keyboard"></i> {{ oic_update_form.extension.label(class="form-label") }}
+                        {{ oic_update_form.extension(class="form-control", id="editExtension") }}
+                    </div>
+                    <div class="col">
+                        <i class="fa-solid fa-arrow-right-to-city"></i> {{ oic_update_form.direccion.label(class="form-label") }}
+                        {{ oic_update_form.direccion(class="form-control", id="editDireccion") }}
+                    </div>
+                </div>
+            
+                <div class="row">
+                    <div class="col">
+                        <i class="fa-solid fa-building-circle-arrow-right"></i> {{ oic_update_form.colonia.label(class="form-label") }}
+                        {{ oic_update_form.colonia(class="form-control", id="editColonia") }}
+                    </div>
+                    <div class="col">
+                       <i class="fa-solid fa-envelopes-bulk"></i> {{ oic_update_form.codigo_postal.label(class="form-label") }}
+                        {{ oic_update_form.codigo_postal(class="form-control", id="editCodigoPostal") }}
+                    </div>
+                </div>
+            
+            
+                <br>
+                <div class="mb-3">
+                    <p>Estatus:</p>
+                    <p id="statusTextOIC"></p> <!-- Asegúrate de que este ID coincida con el utilizado en tu JavaScript -->
+
+                        <label class="switch">
+                            <input type="checkbox" id="editEstaHabilitado" name="esta_habilitado">
+                            <span class="slider"></span>
+                        </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">✖</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="fa-regular fa-floppy-disk"></i>
+                    </button>
+        
+                </div>
+            </form>
+            
+            
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  {% endblock %}
+
+  {% block scripts %}
+  <script>
+     // Mostrar el buscador cuando se hace clic en la tabla
+ document.addEventListener('click', function(event) {
+    var searchBox = document.getElementById('searchBox');
+    var isInsideSearchBox = event.target.closest('#searchBox');
+    var isEditButton = event.target.classList.contains('btn-edit-oic');
+    var isInsideTable = event.target.closest('.table');
+
+   
+});
+// Funcionalidad de filtrado
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    var searchValue = this.value.toLowerCase();
+    var tableRows = document.querySelectorAll('.table tbody tr');
+
+    tableRows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        var isVisible = searchValue.split(' ').some(function(term) {
+            return text.includes(term);
+        });
+        row.style.display = isVisible ? '' : 'none';
+    });
+});
+  </script>
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var editOICModal = document.getElementById('editOICModal');
+    var editOICForm = document.getElementById('editOICForm');
+    var editOICId = document.getElementById('editOICId');
+    var editNombreCompleto = document.getElementById('editNombreCompleto');
+    var editTelefono = document.getElementById('editTelefono');
+    var editExtension = document.getElementById('editExtension');
+    var editEmail = document.getElementById('editCorreoElectronico');
+    var editDireccion = document.getElementById('editDireccion');
+    var editColonia = document.getElementById('editColonia');
+    var editCodigoPostal = document.getElementById('editCodigoPostal');
+    var editCiudad = document.getElementById('editCiudad');
+    var editSector = document.getElementById('editSector');
+    var editEstaHabilitado = document.getElementById('editEstaHabilitado');
+
+    
+
+    document.querySelectorAll('.btn-edit-oic').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var oicId = button.getAttribute('data-oic-id');
+            var fullName = button.getAttribute('data-nombre-completo');
+            var email = button.getAttribute('data-correo-electronico');
+            var phone = button.getAttribute('data-telefono');
+            var extension = button.getAttribute('data-extension');
+            var address = button.getAttribute('data-direccion');
+            var district = button.getAttribute('data-colonia');
+            var postalCode = button.getAttribute('data-codigo-postal');
+            var city = button.getAttribute('data-ciudad');
+            var sector = button.getAttribute('data-sector');
+            var dependency = button.getAttribute('data-dependencia');
+            // Obtiene el estado de habilitación del OIC
+            var isEnabled = button.getAttribute('data-esta-habilitado') === 'true';
+            // Establece la acción del formulario para actualizar el OIC
+            editOICForm.action = "{{ url_for('update_oic') }}";
+            // Establece los valores de los campos del formulario con los datos del OIC
+            editOICId.value = oicId;
+            editNombreCompleto.value = fullName;
+            editEmail.value = email;
+            // Continúa estableciendo los valores para los otros campos
+            editTelefono.value = phone;
+            editExtension.value = extension;
+            editDireccion.value = address;
+            editColonia.value = district;
+            editCodigoPostal.value = postalCode;
+            editCiudad.value = city;
+            editSector.value = sector;
+        
+
+            var estaHabilitado = button.getAttribute('data-esta-habilitado') === 'true';
+            console.log("Valor de estaHabilitado antes de abrir el modal:", estaHabilitado);
+            
+            editEstaHabilitado.checked = estaHabilitado;
+            updateOICStatusText();
+            editEstaHabilitado.addEventListener('change', updateOICStatusText);
+            
+
+            var modal = new bootstrap.Modal(editOICModal);
+            modal.show();
+        });
+    });
+
+    editOICModal.addEventListener('hidden.bs.modal', function () {
+        editOICForm.reset();
+    });
+    // Limpia el formulario cuando el modal de OIC se cierra
+editOICModal.addEventListener('hidden.bs.modal', function () {
+    editOICId.value = '';
+    editNombreCompleto.value = '';
+    editEmail.value = '';
+    // Continúa limpiando los otros campos
+    editTelefono.value = '';
+    editExtension.value = '';
+    editDireccion.value = '';
+    editColonia.value = '';
+    editCodigoPostal.value = '';
+    editCiudad.value = '';
+    editSector.value = '';
+    editOICForm.reset(); // Resetea los valores del formulario y validaciones
+});
+document.getElementById('editOICForm').addEventListener('submit', function() {
+    document.getElementById('editNombreCompleto').disabled = false;
+    document.getElementById('editCiudad').disabled = false;
+});
+});
+function checkEmail() {
+    var email = document.getElementById('correo_electronico');
+    var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Patrón simple para validar emails
+
+    if (pattern.test(email.value)) {
+        email.classList.add('valid');
+        email.classList.remove('invalid');
+    } else {
+        email.classList.add('invalid');
+        email.classList.remove('valid');
+    }
+}
+
+document.getElementById('email').addEventListener('keyup', checkEmail);
+
+function updateOICStatusText() {
+    var checkboxOIC = document.getElementById('editEstaHabilitado');
+    var statusTextOIC = document.getElementById('statusTextOIC'); // Asegúrate de tener este ID en tu HTML
+
+    if (checkboxOIC.checked) {
+        statusTextOIC.textContent = 'Habilitado';
+        statusTextOIC.style.color = 'green';
+    } else {
+        statusTextOIC.textContent = 'Inhabilitado';
+        statusTextOIC.style.color = 'red';
+    }
+}
+
+    </script>
+    <script>
+        var loggedin = $('#loggedin').data('data'); // Referencia a base.html
+        var currentUserRole = "{{ current_user.rol }}";
+            var manageUsersUrl = "{{ url_for('manage_users') }}";
+            var addDataUrl = "{{ url_for('add_data') }}";
+            var agregarDependenciaUrl = "{{ url_for('agregar_dependencia') }}";
+            var asignarDependenciaUrl = "{{ url_for('asignar_dependencia') }}";
+            var login = "{{ url_for('login') }}";
+            var logout = "{{ url_for('logout') }}";
+        
+            $(document).ready(function () {
+            setTimeout(function () {
+                let menuHTML = '<li class="stg-nav-item"><a href="./" class="stg-nav-link">Inicio</a></li>';
+        
+                if (currentUserRole == 1) {
+                    menuHTML += '<li class="stg-nav-item"><a href="' + manageUsersUrl + '" class="stg-nav-link">Catálogo Usuarios</a></li>';
+                }
+                if(loggedin == 1){
+                menuHTML += '<li class="stg-nav-item"><a href="' + agregarDependenciaUrl + '" class="stg-nav-link">Agregar Dependencia</a></li>';
+                menuHTML += '<li class="stg-nav-item"><a href="' + asignarDependenciaUrl + '" class="stg-nav-link">Asignar Dependencia</a></li>';
+                menuHTML += '<li class="stg-nav-item"><a href="' +logout + '" class="stg-nav-link"><i class="fa-solid fa-right-from-bracket"></i></a></li>';
+                }else{
+                    menuHTML += '<li class="stg-nav-item"><a href="' +login + '" class="stg-nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></li>';
+                }
+                
+        
+                $("#stgNavMain").html(menuHTML);
+            }, 200);
+        });
+        document.querySelector('.btn-close').addEventListener('click', function() {
+    var modal = bootstrap.Modal.getInstance(editOICModal);
+    modal.hide();
+});
+editOICModal.addEventListener('hidden.bs.modal', function () {
+    document.body.classList.remove('modal-open');
+    document.querySelector('.modal-backdrop').remove();
+});
+        </script>
+  {% endblock %}
+<!-- JavaScript Bundle con Popper (Bootstrap 5) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% block title %}Agregar Dependencia{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-3">Agregar Dependencia</h2>
+    <form method="POST" action="{{ url_for('agregar_dependencia') }}" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            <i class="fa-solid fa-signature"></i> {{ form.nombre.label(class="form-label") }}
+            {{ form.nombre(class="form-control" + (" is-invalid" if form.nombre.errors else "")) }}
+            {% for error in form.nombre.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="mb-3">
+            <i class="fa-solid fa-image"></i> {{ form.foto.label(class="form-label") }}
+            {{ form.foto(class="form-control" + (" is-invalid" if form.foto.errors else "")) }}
+            {% for error in form.foto.errors %}
+                <div class="invalid-feedback">{{ error }}</div>
+            {% endfor %}
+        </div>
+        <div class="">
+            <button type="submit" class="btn btn-success">
+                <i class="fa-regular fa-floppy-disk"></i>
+            </button>
+        </div>
+    </form>
+    <h3 class="mt-4">Dependencias Existentes</h3>
+    <!-- Campo de búsqueda oculto -->
+    <div id="searchBox" style="position:relative; width:100%;">
+        <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre de la Dependencia</th>
+                <th>Logo</th>
+                <th>Estatus</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dependencia in dependencias %}
+            
+            <tr>
+                <td>{{ dependencia.nombre }}</td>
+                <td><img src="{{ url_for('uploaded_file', filename=dependencia.foto) }}" width="100" alt="Foto de Dependencia"></td>
+                <td>
+                   
+                    <label class="switch">
+                        <input type="checkbox" disabled {{ 'checked' if dependencia.habilitada else '' }}>
+                        <span class="slider"></span>
+                    </label>
+                </td>
+                <td>
+                    <button type="button" class="btn btn-edit btn-edit-dependencia" data-bs-toggle="modal" data-bs-target="#editDependenciaModal" data-dependencia-id="{{ dependencia.id }}" data-dependencia-nombre="{{ dependencia.nombre }}" data-dependencia-foto="{{ dependencia.foto }}" data-dependencia-habilitada="{{ 'true' if dependencia.habilitada else 'false' }}">Editar</button>
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+<!-- Modal para editar dependencia -->
+<div class="modal fade" id="editDependenciaModal" tabindex="-1" aria-labelledby="editDependenciaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title text-start w-100" id="editDependenciaModalLabel" style="left: 0;">Editar Dependencia</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editDependenciaForm" method="POST" action="{{ url_for('update_dependencia') }}" enctype="multipart/form-data">
+            {{ dependencia_update_form.hidden_tag() }}
+            <input type="hidden" name="dependencia_id" id="editDependenciaId">
+  
+            <div class="mb-3">
+                <i class="fa-solid fa-signature"></i> {{ dependencia_update_form.nombre.label(class="form-label") }}
+              {{ dependencia_update_form.nombre(class="form-control", id="editDependenciaNombre", disabled = "True") }}
+            </div>
+  
+            <div class="mb-3">
+                <i class="fa-solid fa-image"></i> {{ dependencia_update_form.foto.label(class="form-label") }}
+              <br>
+              <img id="currentDependenciaImage" src="" width="100" alt="Foto actual de la Dependencia">
+              
+              {{ dependencia_update_form.foto(class="form-control") }}
+            </div>
+            <div class="mb-3">
+    
+                <p>Estatus:</p>
+                        <p id="statusText"></p>
+                        <label class="switch">
+                            <input type="checkbox" id="editDependenciaHabilitada" name="habilitada">
+                            <span class="slider"></span>
+                        </label>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">✖</button>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+            </div>
+          </form>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+</div>
+<script>
+
+
+
+
+     // Mostrar el buscador cuando se hace clic en la tabla
+document.addEventListener('click', function(event) {
+    var searchBox = document.getElementById('searchBox');
+    var isInsideSearchBox = event.target.closest('#searchBox');
+    var isEditButton = event.target.classList.contains('btn-edit-dependencia');
+    var isInsideTable = event.target.closest('.table');
+
+   
+});
+
+// Funcionalidad de filtrado
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    var searchValue = this.value.toLowerCase();
+    var tableRows = document.querySelectorAll('.table tbody tr');
+
+    tableRows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        var isVisible = searchValue.split(' ').some(function(term) {
+            return text.includes(term);
+        });
+        row.style.display = isVisible ? '' : 'none';
+    });
+});
+document.getElementById('editDependenciaForm').addEventListener('submit', function() {
+    document.getElementById('editDependenciaNombre').disabled = false;
+});
+    document.querySelectorAll('.btn-edit-dependencia').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var dependenciaId = button.getAttribute('data-dependencia-id');
+        var dependenciaNombre = button.getAttribute('data-dependencia-nombre');
+        var dependenciaFoto = button.getAttribute('data-dependencia-foto');
+        var dependenciaHabilitada = button.getAttribute('data-dependencia-habilitada') === 'true';
+
+        // Rellena los campos del formulario en el modal
+        document.getElementById('editDependenciaId').value = dependenciaId;
+        document.getElementById('editDependenciaNombre').value = dependenciaNombre;
+        document.getElementById('currentDependenciaImage').src = "{{ url_for('uploaded_file', filename='') }}" + dependenciaFoto;
+        document.getElementById('editDependenciaHabilitada').checked = dependenciaHabilitada;
+
+        // Muestra el modal
+        updateStatusText();
+        var modal = new bootstrap.Modal(document.getElementById('editDependenciaModal'));
+        modal.show();
+    });
+    var checkbox = document.getElementById('editDependenciaHabilitada');
+    var statusText = document.getElementById('statusText');
+
+    // Función para actualizar el texto del párrafo
+    function updateStatusText() {
+        if(checkbox.checked) {
+            statusText.textContent = 'Habilitado'; // Texto cuando el checkbox está marcado
+            statusText.style.color = 'green'; // Opcional: Cambiar el color del texto a verde
+        } else {
+            statusText.textContent = 'Inhabilitado'; // Texto cuando el checkbox no está marcado
+            statusText.style.color = 'red'; // Opcional: Cambiar el color del texto a rojo
+        }
+    }
+
+    // Evento para detectar el cambio de estado del checkbox
+    checkbox.addEventListener('change', updateStatusText);
+
+    // Llamada inicial para establecer el estado correcto al cargar la página
+    updateStatusText();
+});
+document.querySelector('#editDependenciaModal .btn-close').addEventListener('click', function() {
+    var modal = bootstrap.Modal.getInstance(document.getElementById('editDependenciaModal'));
+    modal.hide();
+});
+document.getElementById('editDependenciaModal').addEventListener('hidden.bs.modal', function () {
+    document.body.classList.remove('modal-open');
+    document.querySelector('.modal-backdrop').remove();
+});
+        var loggedin = $('#loggedin').data('data'); // Referencia a base.html
+        var currentUserRole = "{{ current_user.rol }}";
+            var manageUsersUrl = "{{ url_for('manage_users') }}";
+            var addDataUrl = "{{ url_for('add_data') }}";
+            var agregarDependenciaUrl = "{{ url_for('agregar_dependencia') }}";
+            var asignarDependenciaUrl = "{{ url_for('asignar_dependencia') }}";
+            var login = "{{ url_for('login') }}";
+            var logout = "{{ url_for('logout') }}";
+        
+            $(document).ready(function () {
+            setTimeout(function () {
+                let menuHTML = '<li class="stg-nav-item"><a href="./" class="stg-nav-link">Inicio</a></li>';
+        
+                if (currentUserRole == 1) {
+                    menuHTML += '<li class="stg-nav-item"><a href="' + manageUsersUrl + '" class="stg-nav-link">Catálogo Usuarios</a></li>';
+                }
+                if(loggedin == 1){
+                    menuHTML += '<li class="stg-nav-item"><a href="' + addDataUrl + '" class="stg-nav-link">Agregar OIC</a></li>';
+                menuHTML += '<li class="stg-nav-item"><a href="' + asignarDependenciaUrl + '" class="stg-nav-link">Asignar Dependencia</a></li>';
+                menuHTML += '<li class="stg-nav-item"><a href="' +logout + '" class="stg-nav-link"><i class="fa-solid fa-right-from-bracket"></i></a></li>';
+                }else{
+                  menuHTML += '<li class="stg-nav-item"><a href="' +login + '" class="stg-nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></li>';
+                }
+                
+        
+                $("#stgNavMain").html(menuHTML);
+            }, 200);
+        });
+</script>
+{% endblock %}

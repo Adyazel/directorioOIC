@@ -1,0 +1,415 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo de Usuarios{% endblock %}
+{% block scriptshead %}
+<link href="{{ url_for('static', filename='css/stylesusers.css') }}" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h2>Añadir Usuario</h2>
+    <!-- El formulario ahora solo se usa para añadir usuarios, no para editarlos -->
+    <form id="formularioRegistro" method="POST" action="{{ url_for('manage_users') }}">
+        {{ user_form.hidden_tag() }}
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-user"></i> {{ user_form.username.label(class="form-label") }}
+                {{ user_form.username(class="form-control") }} 
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-envelope"></i> {{ user_form.email.label(class="form-label") }}
+                <input type="email" id="email" name="email" class="form-control" onkeyup="checkEmail()">
+            </div>
+            
+            
+        </div>
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-lock"></i> {{ user_form.password.label(class="form-label") }}
+                <input type="password" id="password" name="password" class="form-control" onkeyup="checkPassword()">
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-key"></i> {{ user_form.confirm_password.label(class="form-label") }}
+                <input type="password" id="confirm_password" name="confirm_password" class="form-control" onkeyup="checkPassword()" disabled>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-id-card"></i> {{ user_form.full_name.label(class="form-label") }}
+                {{ user_form.full_name(class="form-control") }}
+            </div>
+            <div class="col">
+                <i class="fa-solid fa-phone"></i> {{ user_form.phone_ext.label(class="form-label") }}
+                {{ user_form.phone_ext(class="form-control") }}
+                
+            </div>
+            
+        </div>
+        <div class="row">
+            <div class="col">
+                <i class="fa-solid fa-user-tie"></i> {{ user_form.administrative_unit.label(class="form-label") }}
+                {{ user_form.administrative_unit(class="form-control") }}
+            </div>
+        </div>
+    
+        <div class="row">
+            <div class="col">
+                <br>
+                <button type="submit" class="btn btn-success">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                </button>
+            </div>
+        
+    </form>
+    <br><br><br>
+    <hr>
+    <div class="table-responsive">
+        <h3>Lista de Usuarios</h3>
+        <!-- Campo de búsqueda oculto -->
+        <div id="searchBox" style="position:relative; width:100%;">
+            <input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+        </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+                <th>Nombre Completo</th> <!-- Nueva columna para Nombre Completo -->
+                <th>Unidad Administrativa</th> <!-- Nueva columna para Unidad Administrativa -->
+                <th>Teléfono: Ext</th> <!-- Nueva columna para Teléfono: Ext -->
+                <th>Estatus</th> <!-- Columna adicional para Estado -->
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.full_name }}</td> <!-- Datos de Nombre Completo -->
+                <td>{{ user.administrative_unit }}</td> <!-- Datos de Unidad Administrativa -->
+                <td>{{ user.phone_ext }}</td> <!-- Datos de Teléfono: Ext -->
+                
+                <td>
+                    <!-- <input type="checkbox" disabled {{ 'checked' if user.is_enabled else '' }}> <!-- Checkbox para mostrar el estado -->
+                    <label class="switch">
+                        <input type="checkbox" disabled {{ 'checked' if user.is_enabled else '' }} >
+                        <span class="slider"></span>
+                    </label>
+                </td>
+                <td>
+                    <!-- Botón para abrir el modal de edición con los datos del usuario -->
+                    <button type="button" 
+                    class="btn btn-edit btn-edit-user" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#editUserModal" 
+                    data-user-id="{{ user.id }}" 
+                    data-username="{{ user.username }}" 
+                    data-email="{{ user.email }}" 
+                    data-full-name="{{ user.full_name }}" 
+                    data-administrative-unit="{{ user.administrative_unit }}" 
+                    data-phone-ext="{{ user.phone_ext }}"
+                    data-is-enabled="{{ 'true' if user.is_enabled else 'false' }}">Editar</button>
+            
+    
+    
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    
+    </div>
+    
+    
+
+</div>
+
+<!-- Modal para editar usuario -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-start w-100" id="editUserModalLabel" style="left: 0;">Editar Usuario</h5>
+
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="editUserForm" method="POST" action="{{ url_for('update_user') }}">
+                    {{ user_update_form.hidden_tag() }}
+                    <input type="hidden" name="user_id" id="editUserId">
+                    <div class="row">
+                        <div class="col">
+                            <i class="fa-solid fa-user"></i> {{ user_update_form.username.label(class="form-label") }}
+                            {{ user_update_form.username(class="form-control", id="editUsername", disabled=True) }}
+                        </div>
+                        <div class="col">
+                            <i class="fa-solid fa-envelope"></i> {{ user_update_form.email.label(class="form-label") }}
+                            {{ user_update_form.email(class="form-control", id="editEmail") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <i class="fa-solid fa-key"></i> {{ user_update_form.password.label(class="form-label") }}
+                            {{ user_update_form.password(class="form-control") }}
+                        </div>
+                        <div class="col">
+                            <i class="fa-solid fa-id-card"></i> {{ user_update_form.full_name.label(class="form-label") }}
+                            {{ user_update_form.full_name(class="form-control", id="editFullName", disabled=True) }}
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <i class="fa-solid fa-phone"></i> {{ user_update_form.phone_ext.label(class="form-label") }}
+                            {{ user_update_form.phone_ext(class="form-control", id="editPhoneExt") }}
+                            
+                        </div>
+                        <div class="col">
+                            <i class="fa-solid fa-user-tie"></i> {{ user_update_form.administrative_unit.label(class="form-label") }}
+                            {{ user_update_form.administrative_unit(class="form-control", id="editAdministrativeUnit",disabled=True) }}
+                        </div>
+                    
+                    </div>
+                    <div class="mb-3">
+                        <p>Estatus:</p>
+                        <p id="statusText"></p>
+                        <label class="switch">
+                            <input type="checkbox" id="editIsEnabled" name="is_enabled">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">✖</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-regular fa-floppy-disk"></i>
+                        </button>
+                    </div>
+                </form>
+                
+            </div>
+           
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<script>
+ // Mostrar el buscador cuando se hace clic en la tabla
+document.addEventListener('click', function(event) {
+    var searchBox = document.getElementById('searchBox');
+    var isInsideSearchBox = event.target.closest('#searchBox');
+    var isEditButton = event.target.classList.contains('btn-edit-user');
+    var isInsideTable = event.target.closest('.table');
+
+   
+});
+
+// Funcionalidad de filtrado
+document.getElementById('searchInput').addEventListener('keyup', function() {
+    var searchValue = this.value.toLowerCase();
+    var tableRows = document.querySelectorAll('.table tbody tr');
+
+    tableRows.forEach(function(row) {
+        var text = row.textContent.toLowerCase();
+        var isVisible = searchValue.split(' ').some(function(term) {
+            return text.includes(term);
+        });
+        row.style.display = isVisible ? '' : 'none';
+    });
+});
+    document.getElementById('editUserForm').addEventListener('submit', function() {
+    document.getElementById('editAdministrativeUnit').disabled = false;
+    document.getElementById('editFullName').disabled = false;
+    document.getElementById('editUsername').disabled = false;
+});
+
+    function checkEmail() {
+    var email = document.getElementById('email');
+    var pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Patrón simple para validar emails
+
+    if (pattern.test(email.value)) {
+        email.classList.add('valid');
+        email.classList.remove('invalid');
+    } else {
+        email.classList.add('invalid');
+        email.classList.remove('valid');
+    }
+}
+
+document.getElementById('email').addEventListener('keyup', checkEmail);
+
+    function checkPassword() {
+    var password = document.getElementById('password');
+    var confirm_password = document.getElementById('confirm_password');
+
+    if (password.value.length > 0) {
+        confirm_password.disabled = false;
+    } else {
+        confirm_password.disabled = true;
+        confirm_password.classList.remove('valid', 'invalid');
+    }
+
+    if (password.value === confirm_password.value) {
+        confirm_password.classList.add('valid');
+        confirm_password.classList.remove('invalid');
+    } else {
+        confirm_password.classList.add('invalid');
+        confirm_password.classList.remove('valid');
+    }
+}
+    document.addEventListener("DOMContentLoaded", function () {
+    var editUserModal = document.getElementById('editUserModal');
+    var editUserForm = document.getElementById('editUserForm');
+    var editUserId = document.getElementById('editUserId');
+    var editUsername = document.getElementById('editUsername');
+    var editEmail = document.getElementById('editEmail');
+    // Agrega referencias a los nuevos campos
+    var editFullName = document.getElementById('editFullName');
+    var editAdministrativeUnit = document.getElementById('editAdministrativeUnit');
+    var editPhoneExt = document.getElementById('editPhoneExt');
+    // Referencia al campo de habilitación (mover esta línea dentro del evento de clic más abajo)
+    var editIsEnabled = document.getElementById('editIsEnabled');
+    // Evento que se dispara al hacer clic en el botón de editar usuario
+    document.querySelectorAll('.btn-edit-user').forEach(function(button) {
+        button.addEventListener('click', function() {
+            var userId = button.getAttribute('data-user-id');
+            var username = button.getAttribute('data-username');
+            var email = button.getAttribute('data-email');
+            // Obtiene los datos adicionales del usuario
+            var fullName = button.getAttribute('data-full-name');
+            var administrativeUnit = button.getAttribute('data-administrative-unit');
+            var phoneExt = button.getAttribute('data-phone-ext');
+            // Obtiene el estado de habilitación del usuario
+            var isEnabled = button.getAttribute('data-is-enabled') === 'true';
+            updateStatusText();
+            // Referencia al campo de habilitación
+            var editIsEnabled = document.getElementById('editIsEnabled');
+
+            // Establece la acción del formulario para actualizar el usuario
+            editUserForm.action = "{{ url_for('update_user') }}";
+
+            // Establece los valores de los campos del formulario con los datos del usuario
+            editUserId.value = userId;
+            editUsername.value = username;
+            editEmail.value = email;
+            // Establece los valores de los nuevos campos
+            editFullName.value = fullName;
+            editAdministrativeUnit.value = administrativeUnit;
+            editPhoneExt.value = phoneExt;
+            // Establece el valor del campo de habilitación
+            editIsEnabled.checked = isEnabled;
+            
+            // Muestra el modal
+            var modal = new bootstrap.Modal(editUserModal);
+            updateStatusText();
+            modal.show();
+            
+        });
+    });
+
+    // Limpia el formulario cuando el modal se cierra
+    editUserModal.addEventListener('hidden.bs.modal', function () {
+        editUserId.value = '';
+        editUsername.value = '';
+        editEmail.value = '';
+        // Limpia los nuevos campos
+        editFullName.value = '';
+        editAdministrativeUnit.value = '';
+        editPhoneExt.value = '';
+        editUserForm.reset(); // Resetea los valores del formulario y validaciones
+    });
+    $(document).ready(function() {
+    $('#administrative_unit').select2({
+        placeholder: "Seleccione una opción",
+    });
+    });
+  
+// Inicializa Select2 cuando se muestra el modal
+//$('#editUserModal').on('shown.bs.modal', function () {
+  // $('#editAdministrativeUnit').select2({
+    //   placeholder: "Seleccione una opción",
+      // dropdownParent: $('#editUserModal') // Asegurarse de que el desplegable de Select2 se renderiza dentro del modal
+    // });
+//});
+
+var checkbox = document.getElementById('editIsEnabled');
+    var statusText = document.getElementById('statusText');
+
+    // Función para actualizar el texto del párrafo
+    function updateStatusText() {
+        if(checkbox.checked) {
+            statusText.textContent = 'Habilitado'; // Texto cuando el checkbox está marcado
+            statusText.style.color = 'green'; // Opcional: Cambiar el color del texto a verde
+        } else {
+            statusText.textContent = 'Inhabilitado'; // Texto cuando el checkbox no está marcado
+            statusText.style.color = 'red'; // Opcional: Cambiar el color del texto a rojo
+        }
+    }
+
+    // Evento para detectar el cambio de estado del checkbox
+    checkbox.addEventListener('change', updateStatusText);
+
+    // Llamada inicial para establecer el estado correcto al cargar la página
+    updateStatusText();
+    document.getElementById('editOICForm').addEventListener('submit', function() {
+    document.getElementById('editNombreCompleto').disabled = false;
+    document.getElementById('editCiudad').disabled = false;
+});
+});
+
+
+
+    </script>
+    
+
+<script>
+    var loggedin = $('#loggedin').data('data'); // Referencia a base.html
+    var currentUserRole = "{{ current_user.rol }}";
+        var manageUsersUrl = "{{ url_for('manage_users') }}";
+        var addDataUrl = "{{ url_for('add_data') }}";
+        var agregarDependenciaUrl = "{{ url_for('agregar_dependencia') }}";
+        var asignarDependenciaUrl = "{{ url_for('asignar_dependencia') }}";
+        var login = "{{ url_for('login') }}";
+        var logout = "{{ url_for('logout') }}";
+    
+        $(document).ready(function () {
+        setTimeout(function () {
+            let menuHTML = '<li class="stg-nav-item"><a href="./" class="stg-nav-link">Inicio</a></li>';
+    
+            if(loggedin == 1){
+                menuHTML += '<li class="stg-nav-item"><a href="' + addDataUrl + '" class="stg-nav-link">Agregar OIC</a></li>';
+            menuHTML += '<li class="stg-nav-item"><a href="' + agregarDependenciaUrl + '" class="stg-nav-link">Agregar Dependencia</a></li>';
+            menuHTML += '<li class="stg-nav-item"><a href="' + asignarDependenciaUrl + '" class="stg-nav-link">Asignar Dependencia</a></li>';
+            menuHTML += '<li class="stg-nav-item"><a href="' +logout + '" class="stg-nav-link"><i class="fa-solid fa-right-from-bracket"></i></a></li>';
+            }else{
+                menuHTML += '<li class="stg-nav-item"><a href="' +login + '" class="stg-nav-link"><i class="fa-solid fa-arrow-right-to-bracket"></i></a></li>';
+            }
+            
+    
+            $("#stgNavMain").html(menuHTML);
+        }, 200);
+    });
+
+
+
+    // Listener para el botón de cerrar del modal
+document.querySelector('#editUserModal .btn-close').addEventListener('click', function() {
+    var modal = bootstrap.Modal.getInstance(document.getElementById('editUserModal'));
+    modal.hide();
+});
+document.getElementById('editUserModal').addEventListener('hidden.bs.modal', function () {
+    document.body.classList.remove('modal-open');
+    document.querySelector('.modal-backdrop').remove();
+});
+
+    </script>
+{% endblock %}

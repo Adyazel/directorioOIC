@@ -1,0 +1,455 @@
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;700&display=swap');
+
+
+*{ margin: 0;}
+
+:root{
+  --azulTitulos:#004d84;
+  --azulTitulos2:#0C5893;
+  --azulBotones: #1785bc; 
+  --azulBotonesOscuro: #147cb4; 
+}
+h2, h1, h3, h4, h5{
+    color: var(--azulTitulos2);
+}
+
+.stg-footer h2,.stg-footer h1,.stg-footer h3,.stg-footer h4,.stg-footer h5{
+    color: white;
+}
+
+body {
+    font-family: 'Public Sans', sans-serif;
+}
+
+.card-header{
+    color: var(--azulTitulos);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+.bannerArriba .stg-navbar-collapse li a:hover {
+    color: #be0f63;
+    text-decoration: underline;
+}
+
+.card-directorio-oic {
+    border: 3px solid rgba(0,0,0,.6);
+    border-radius: 1.3rem;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    overflow: hidden;
+}
+.card-directorio-oic hr {
+    height: 2px;
+    margin-bottom: 10px;
+    background-color: rgba(0,0,0,.6);
+    opacity: 1;
+
+}
+.closing {
+    transition: max-height 0.5s ease-out; /* Transición suave para el cierre */
+    max-height: 300px; /* Altura máxima inicial (ajusta según sea necesario) */
+}
+.boton-buscar{
+    background-color: #f52e6d;
+    border-color: #f52e6d;
+    border-radius: 0.8rem;
+    width: 100%;
+    color: white;
+}
+.btn-edit{
+    background-color: var(--azulBotones);
+    color: white;
+}
+.btn-edit:hover{
+    background-color: var(--azulBotonesOscuro);
+    color: rgb(221, 221, 221);
+}
+
+
+.closed {
+    max-height: 0; /* Altura después del cierre */
+    transition: max-height 0.5s ease-in; /* Transición suave para el cierre */
+}
+.dependencia-images-container {
+    transition: max-height 0.5s ease-in-out;
+    max-height: 0; /* Comienza oculto */
+    overflow: hidden; /* Asegura que el contenido esté oculto cuando max-height es 0 */
+}
+
+#integra2_myBtn{
+    left: 0;
+}
+
+.integra2_modale-content {
+    left: 0px;
+}
+
+.search-container {
+    margin-bottom: 20px;
+    margin-left: 10px;
+    position: relative;
+}
+#suggestion-preview {
+    pointer-events: none;
+    position: absolute;
+    z-index: 3; /* Detrás del campo de búsqueda */
+    color: #a6a6a6; /* Color difuminado */
+    /* Otros estilos para alinearlo con el campo de búsqueda */
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.8rem;
+    width: 100%;
+    opacity: 50%;
+}
+#search-bar {
+    position: relative;
+    z-index: 2; /* En primer plano */
+    /* Otros estilos necesarios */
+   
+}
+#suggestions-container {
+    position: absolute;
+    z-index: 3; /* El nivel más alto para que esté encima de todo */
+    top: 100%; /* Alineado directamente debajo del campo de búsqueda */
+    margin-left: 10px;
+    background-color: #eae5e5; /* Color de fondo para las sugerencias */
+    /* Otros estilos como bordes, sombras, etc. */
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra opcional para resaltar */
+    border-radius: 0 0 0.8rem 0.8rem; /* Bordes redondeados en la parte inferior */
+    overflow: hidden;
+    left: 0;
+    width: calc(100% - 12.2rem);
+    border: 1px solid #ccc;
+}
+  .search-container label {
+    
+    font-weight: bold;
+    font-size: 1.3rem;
+    font-style: italic;
+    border-bottom: 3px solid #f52e6d;
+    margin-bottom: 3px;
+  }
+
+  .search-container input[type="text"] {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    color: #212529;
+    background-color: #eae5e5;
+    border: 1px solid #eae5e5;
+    border-radius: 0.8rem;
+  }
+
+  .search-container input[type="text"]:focus {
+    border-color: #555;
+    outline: none; /* Removes the default outline */
+  }
+
+
+hr {
+    margin: 1rem 0;
+    color: inherit;
+    background-color: currentColor;
+    border: 0;
+    opacity: .25;
+}
+.card-directorio-oic h3{
+    border-left: none;
+    padding-left: 0pc;
+    font-weight: 800;
+    letter-spacing: normal;
+    font-style: italic;
+    text-transform: uppercase;
+    color: #004d84;
+    font-size: 1.3rem;
+    line-height: 1;
+    padding-bottom: 15px;
+    font-family: 'Public Sans',sans-serif;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    --bs-gutter-x: 1.5rem;
+    --bs-gutter-y: 0;
+}
+.card-directorio-oic p {
+    margin-bottom: 0px;
+    font-size: 1.1rem;
+}
+
+.bannerArriba .stg-navbar-collapse li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 3px;
+}
+
+ .title-oic {
+    border: 5px solid #f52e6d;
+    margin-bottom: 50px;
+}
+.hamburguesaOIC{
+    color: white;
+    float: right;
+    cursor:pointer;
+    padding: 7px;
+    background-color: #f52e6d;
+    border:#f52e6d solid 3px;
+    border-radius: 3px;
+    font-size: large;
+}
+
+.text-center {
+    text-align: center!important;
+}
+
+.title-oic h1, .title-oic p {
+    color: #0d4e8b;
+}
+h1, h2, h1 a, h2 a {
+    font-family: 'Public Sans',sans-serif;
+}
+
+
+.dependencia-image{
+    max-width: 100%;
+    height: 10vh;
+}
+
+h1, h1 a {
+    font-weight: 700;
+}
+ .title-oic p {
+    color: #0d4e8b;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+}
+.modal {
+    overflow-y:auto;
+  }
+/* Estilo básico para el contenedor del switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+label{
+    margin-top: 15px;
+}
+/* Estilo para el checkbox (oculto) */
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Estilo para la palanca (slider) del switch */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: '';
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+.table {
+    font-size: 0.9em; /* Ajusta el tamaño según sea necesario */
+}
+.iconomodal{
+    display: flex;
+    color: #0C5893;
+    justify-content: center;
+    font-size: 120px;
+    margin-bottom: 15px;
+}
+.custom-table-container {
+    max-width: 100%;
+    overflow-x: auto; /* Permite el desplazamiento horizontal si la tabla es muy ancha */
+}
+.table{
+    width: 100%;
+}
+.wrapper{
+    width: 70% !important;
+}
+/* Estilo del contenedor del modal */
+.custom-modal-container {
+    position: fixed;
+    z-index: 100000000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    opacity: 0;
+    padding-top: 10%; /* Espacio inicial desde la parte superior para la animación */
+    transition: opacity 0.3s ease, padding-top 0.3s ease;
+  }
+  .custom-modal-active {
+    display: flex; /* Hace que el contenedor del modal sea flexible */
+  opacity: 1; /* Totalmente visible */
+  padding-top: 10%; /* Posición final del modal */
+  }
+  /* Estilo del dialog del modal */
+  .custom-modal-dialog {
+    background: #fff;
+    border-radius: 5px;
+    max-width: 500px;
+    width: 100%;
+  }
+  
+  /* Estilo del contenido del modal */
+  .custom-modal-content {
+    padding: 20px;
+  }
+  
+  /* Estilo del header del modal */
+  .custom-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  /* Estilo del título del modal */
+  .custom-modal-title {
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  /* Botón de cerrar personalizado */
+  .custom-modal-close-btn {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 1.5em;
+  }
+
+.btn-modal-confirm{
+    background-color: #0D3276;
+    color: white;
+}
+.btn-modal-cancel{
+    background-color: #E00100;
+    color: white;
+}
+.btn-modal-cancel:hover{
+    background-color: #a90303;
+    color: white;
+}
+.btn-modal-confirm:hover{
+    background-color: #071a3e;
+    color: white;
+}
+  
+  /* Estilo del cuerpo del modal */
+  .custom-modal-body {
+    margin-top: 20px;
+    text-align: center;
+  }
+  
+  /* Estilo del footer del modal */
+  .custom-modal-footer {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 20px;
+    border-top: 1px solid #dee2e6;
+    padding-top: 10px;
+  }
+  
+
+
+
+
+
+.modal-header {
+    display: flex !important;
+    justify-content: space-between !important; /* Alinea los elementos a los extremos */
+    align-items: center !important; /* Centra los elementos verticalmente */
+
+}
+.modal-personalizado {
+    max-width: 300px !important; /* Establece el ancho máximo deseado aquí */
+}
+
+.modal-custom-width {
+    max-width: 500px !important; /* o cualquier ancho que prefieras */
+}
+.modal-title {
+    text-align: left; /* Alinea el texto a la izquierda */
+    margin-left: 0; /* Asegura que no haya margen a la izquierda */
+    width: 100%; /* Opcional: esto podría ayudar si necesitas forzar el ancho */
+    padding-left: 0px !important;
+    margin:0px !important;
+}
+#editUserModalLabel {
+    text-align: left; /* Alinea el texto a la izquierda */
+}
+
+/* Color y símbolo para el estado "habilitado" */
+.switch input:checked + .slider {
+    background-color: #8bc34a; /* Verde */
+}
+.switch input:checked + .slider:before {
+    content: '✔';
+    color: #8bc34a;;
+    font-weight: bold;
+    text-align: center;
+    line-height: 26px;
+    transform: translateX(26px);
+}
+
+/* Estilo para el switch "deshabilitado" */
+.switch input:not(:checked) + .slider {
+    background-color: #f44336; /* Rojo */
+}
+.switch input:not(:checked) + .slider:before {
+    content: '✖';
+    color: #f44336;
+    font-weight: bold;
+    text-align: center;
+    line-height: 26px;
+}
+.select2-container--open {
+    z-index: 999999 !important; /* Un valor alto para asegurar que esté sobre otros elementos */
+}
+.valid {
+    border-color: green;
+}
+.invalid {
+    border-color: red;
+}
+input.form-control:focus.valid {
+    border-color: green !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 255, 0, 0.25) !important; /* Opcional: para cambiar el shadow a verde */
+}
+
+input.form-control:focus.invalid {
+    border-color: red !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25) !important; /* Opcional: para cambiar el shadow a rojo */
+}
+.error {
+    border-color: red !important;
+    /* Opcional: si quieres cambiar el shadow a rojo también */
+    box-shadow: 0 0 0 0.25rem rgba(255, 0, 0, 0.25) !important;
+}

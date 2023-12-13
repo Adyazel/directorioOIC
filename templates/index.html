@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}Directorio de Órganos Internos de Control{% endblock %}
+
+{% block scriptshead %}
+<script src=https://www.infomexsinaloa.org/accesibilidadweb/js_api.aspx?api_key=75C91F2C-2FB0-4C7C-A271-AFE6F46F8FF4&tipo=header&aut=chihuahua.gob.mx type="text/javascript"></script>
+{% endblock %}
+
+
+{% block content %}
+<script src=https://www.infomexsinaloa.org/accesibilidadweb/js_api.aspx?api_key=75C91F2C-2FB0-4C7C-A271-AFE6F46F8FF4&tipo=body&aut=chihuahua.gob.mx type="text/javascript"></script>
+  <div class="container">
+    <br>
+    <div class="row justify-content-center">
+        <div class="col-8 text-center title-oic">
+            <h1>¿Tienes quejas o denuncias?</h1>
+            <p>Acércate con el titular del Órgano Interno de Control de tu dependencia o entidad</p>
+        </div>
+    </div>
+    <div class="search-container">
+      <label for="search-bar">¿A quién deseas buscar?</label>
+      <div class="row">
+        <div class="col">
+          <input type="text" id="suggestion-preview" disabled>
+          <input type="text" id="search-bar" name="search-bar" placeholder="Escribe la dependencia o entidad del funcionario que esta buscando.">
+          <div id="suggestions-container" style="display: none;"></div>
+        </div>
+      </div>
+    </div>
+    
+      
+    </div>
+
+    {% for oic in oic_list %}
+    {% if oic.esta_habilitado %}
+    <div class="card-directorio-oic">
+      <div class="card-directorio-oic-head">
+        <div class="row">
+          <div class="col"><h3>
+            {{ oic.nombre_completo }}
+           </h3> </div>
+           <div class="col"><i class="fa-solid fa-bars hamburguesaOIC"></i></div>
+        </div>
+      </div>
+      <div class="">
+        
+        <p class="sector"> <b>Sector: </b>{{ oic.sector }}</h5>
+        <p class="">{{ oic.correo_electronico }}</p>
+        <p class=""><b>Telefono: </b>{{ oic.telefono }} {% if oic.extension %} / <b>Ext:</b> {{ oic.extension }}{% endif %}</p>
+        <p class="">{{ oic.direccion }}, {{ oic.colonia }}, {{ oic.ciudad }}, C.P. {{ oic.codigo_postal }}</p>
+        <hr>
+        <div class="dependencia-images-container" id="dependencia-container-{{ loop.index0 }}">
+        {% for dependencia in oic.dependencias %}
+        {% if dependencia.habilitada%}
+            <img src="{{ url_for('uploaded_file', filename=dependencia.foto) }}" class="dependencia-image" alt="{{ dependencia.nombre }}">
+        {% endif %}
+        {% endfor %}
+    </div>
+      </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+ 
+{% endblock %}
+{% block scripts %}
+
+<script src="{{ url_for('static', filename='js/dependencias.js') }}"></script>
+<script>
+  var login = "{{ url_for('login') }}";
+
+      var loggedin = $('#loggedin').data('data'); // Referencia a base.html
+      var currentUserRole = "{{ user_role if user_role is not none else 'None' }}";
+      var manageUsersUrl = "{{ url_for('manage_users') }}";
+      var addDataUrl = "{{ url_for('add_data') }}";
+      var agregarDependenciaUrl = "{{ url_for('agregar_dependencia') }}";
+      var asignarDependenciaUrl = "{{ url_for('asignar_dependencia') }}";
+      var logout = "{{ url_for('logout') }}";
+
+      var login = "{{ url_for('login') }}";
+   
+
+    $(document).ready(function () {
+    setTimeout(function () {
+        let menuHTML = '';
+
+        if(loggedin == 1){
+          if (currentUserRole == 1) {
+            menuHTML += '<li class="stg-nav-item"><a href="' + manageUsersUrl + '" class="stg-nav-link">Catálogo Usuarios</a></li>';
+        }
+            menuHTML += '<li class="stg-nav-item"><a href="' + addDataUrl + '" class="stg-nav-link">Agregar OIC</a></li>';
+        menuHTML += '<li class="stg-nav-item"><a href="' + agregarDependenciaUrl + '" class="stg-nav-link">Agregar Dependencia</a></li>';
+        menuHTML += '<li class="stg-nav-item"><a href="' + asignarDependenciaUrl + '" class="stg-nav-link">Asignar Dependencia</a></li>';
+        menuHTML += '<li class="stg-nav-item"><a href="' +logout + '" class="stg-nav-link"><i class="fa-solid fa-right-from-bracket"></i></a></li>';
+        }
+        else{
+            menuHTML += '<li class="stg-nav-item"><a href="' +login + '" class="stg-nav-link">Iniciar Sesión <i class="fa-solid fa-arrow-right-to-bracket"></i></a></li>';
+        }
+        $("#stgNavMain").html(menuHTML);
+    }, 200);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const hamburguesaIcons = document.querySelectorAll('.hamburguesaOIC');
+
+    hamburguesaIcons.forEach(icon => {
+        icon.addEventListener('click', function() {
+            const card = this.closest('.card-directorio-oic');
+            const content = card.querySelector('.dependencia-images-container');
+
+            if (!content.style.maxHeight || content.style.maxHeight === '0px') {
+                // Abre el contenido si max-height es 0 o no está definido
+                content.style.maxHeight = content.scrollHeight + 'px';
+            } else {
+                // Cierra el contenido si max-height está definido y no es 0
+                content.style.maxHeight = '0';
+            }
+        });
+    });
+});
+
+document.getElementById('search-bar').addEventListener('input', function() {
+    var searchQuery = this.value;
+    var suggestionsContainer = document.getElementById('suggestions-container');
+    var suggestionPreview = document.getElementById('suggestion-preview');
+
+    if (searchQuery.length > 2) {
+        fetch('/autocomplete?query=' + encodeURIComponent(searchQuery))
+            .then(response => response.json())
+            .then(sugerencias => {
+                suggestionsContainer.innerHTML = '';
+                if (sugerencias.length > 0) {
+                    // Mostrar la primera sugerencia en el campo difuminado
+                    suggestionPreview.value = searchQuery + sugerencias[0].substring(searchQuery.length);
+                    suggestionsContainer.style.display = 'block';
+
+                    sugerencias.forEach(function(sugerencia) {
+                        var div = document.createElement('div');
+                        div.innerText = sugerencia;
+                        div.addEventListener('click', function() {
+                            document.getElementById('search-bar').value = sugerencia;
+                            suggestionsContainer.style.display = 'none';
+                            suggestionPreview.value = ''; // Limpiar la sugerencia difuminada
+                        });
+                        suggestionsContainer.appendChild(div);
+                    });
+                } else {
+                    suggestionsContainer.style.display = 'none';
+                    suggestionPreview.value = ''; // Limpiar la sugerencia difuminada si no hay sugerencias
+                }
+            });
+    } else {
+        suggestionsContainer.style.display = 'none';
+        suggestionPreview.value = ''; // Limpiar la sugerencia difuminada si la consulta es demasiado corta
+    }
+    var searchQuery = this.value.toLowerCase();
+        var oicCards = document.querySelectorAll('.card-directorio-oic');
+        
+        // Filtrar las tarjetas OIC basado en la entrada de búsqueda
+        oicCards.forEach(card => {
+            var name = card.querySelector('h3').textContent.toLowerCase();
+            var sector = card.querySelector('.sector').textContent.toLowerCase();
+            var email = card.querySelector('.sector').nextSibling.textContent.toLowerCase();
+            var telefono = card.querySelector('.sector').nextSibling.nextSibling.textContent.toLowerCase();
+            var direccion = card.querySelector('.sector').nextSibling.nextSibling.nextSibling.textContent.toLowerCase();
+            // Ajusta los selectores anteriores según la estructura exacta de tu HTML
+            if (name.includes(searchQuery) || sector.includes(searchQuery) || email.includes(searchQuery) || telefono.includes(searchQuery) || direccion.includes(searchQuery)) {
+                card.style.display = ''; // Mostrar si alguna propiedad coincide
+            } else {
+                card.style.display = 'none'; // Ocultar si no hay coincidencias
+            }
+        });
+});
+
+</script>
+
+{% endblock %}
